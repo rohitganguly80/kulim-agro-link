@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,7 +24,7 @@ import { AdvisoryDetail } from "./pages/advisory/AdvisoryDetail";
 import { Profile } from "./pages/Profile";
 import { ChatBot } from "./components/chat/ChatBot";
 import { FAQs } from "./pages/FAQs";
-import { NotFound } from "./pages/NotFound";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -135,7 +134,7 @@ export const FAQs = () => {
             <AccordionItem key={faq.id} value={faq.id}>
               <AccordionTrigger className="text-left">
                 <div className="flex items-center space-x-3">
-                  <Badge variant="outline" className={getCategoryColor(faq.category)} size="sm">
+                  <Badge variant="outline" className={getCategoryColor(faq.category)}>
                     {faq.category}
                   </Badge>
                   <span>{faq.question}</span>
