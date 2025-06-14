@@ -17,7 +17,11 @@ import {
   ShoppingCart,
   Sun,
   CloudRain,
-  Wind
+  Wind,
+  Thermometer,
+  Droplets,
+  Eye,
+  Activity
 } from 'lucide-react';
 
 export const FarmerDashboard = () => {
@@ -30,10 +34,27 @@ export const FarmerDashboard = () => {
     { id: '3', name: 'Wheat Seeds', stock: 0, sold: 50, price: 4.50, status: 'out_of_stock' }
   ];
 
-  const recentSales = [
-    { id: '1', product: 'Organic Tomatoes', buyer: 'John Buyer', quantity: '10 kg', amount: 25.00, date: '2024-01-15' },
-    { id: '2', product: 'Fresh Carrots', buyer: 'Jane Smith', quantity: '15 kg', amount: 27.00, date: '2024-01-14' },
-    { id: '3', product: 'Wheat Seeds', buyer: 'Farm Supply Co', quantity: '5 kg', amount: 22.50, date: '2024-01-13' }
+  const marketPrices = [
+    { crop: 'Tomatoes', current: 2.50, change: '+12%', trend: 'up' },
+    { crop: 'Wheat', current: 1.80, change: '-5%', trend: 'down' },
+    { crop: 'Rice', current: 1.45, change: '+8%', trend: 'up' },
+    { crop: 'Carrots', current: 1.20, change: '+3%', trend: 'up' }
+  ];
+
+  const weatherData = {
+    temperature: 24,
+    humidity: 68,
+    rainfall: 20,
+    windSpeed: 15,
+    condition: 'Partly Cloudy',
+    uvIndex: 6,
+    soilMoisture: 75
+  };
+
+  const advisoryAlerts = [
+    { type: 'disease', message: 'Late blight detected in tomato farms nearby', severity: 'high' },
+    { type: 'weather', message: 'Heavy rain expected in 2 days', severity: 'medium' },
+    { type: 'fertilizer', message: 'Optimal time for nitrogen application', severity: 'low' }
   ];
 
   const monthlyEarnings = 1250.75;
@@ -54,11 +75,20 @@ export const FarmerDashboard = () => {
     return total > 0 ? (stock / total) * 100 : 0;
   };
 
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name}!</h1>
-        <p className="text-gray-600 mt-2">Manage your farm products and track your sales</p>
+        <p className="text-gray-600 mt-2">Manage your farm with comprehensive insights and tools</p>
       </div>
 
       {/* Quick Stats */}
@@ -103,11 +133,11 @@ export const FarmerDashboard = () => {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Low Stock Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">Alerts</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{lowStockAlerts}</span>
+              <span className="text-2xl font-bold">{advisoryAlerts.length}</span>
               <AlertTriangle className="h-6 w-6 text-orange-600" />
             </div>
           </CardContent>
@@ -139,10 +169,41 @@ export const FarmerDashboard = () => {
                 </Button>
                 <Link to="/advisory">
                   <Button className="w-full" variant="outline">
-                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    <Activity className="mr-2 h-4 w-4" />
                     Get Advisory
                   </Button>
                 </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Market Analysis */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <TrendingUp className="mr-2 h-5 w-5 text-green-600" />
+                Market Analysis
+              </CardTitle>
+              <CardDescription>Real-time crop prices and trends</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {marketPrices.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <Leaf className="h-4 w-4 text-green-600" />
+                      </div>
+                      <span className="font-medium">{item.crop}</span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className="font-semibold">${item.current}/kg</span>
+                      <Badge className={item.trend === 'up' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {item.change}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -178,30 +239,6 @@ export const FarmerDashboard = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Recent Sales */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Sales</CardTitle>
-              <CardDescription>Latest transactions and orders</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentSales.map((sale) => (
-                  <div key={sale.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{sale.product}</h4>
-                      <p className="text-sm text-gray-600">{sale.buyer} • {sale.quantity}</p>
-                      <p className="text-xs text-gray-500">{sale.date}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-medium text-green-600">${sale.amount}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Sidebar */}
@@ -211,25 +248,43 @@ export const FarmerDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Sun className="mr-2 h-5 w-5 text-yellow-500" />
-                Weather Today
+                Weather & Farm Conditions
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">24°C</div>
-                  <div className="text-gray-600">Perfect for farming</div>
+                  <div className="text-3xl font-bold">{weatherData.temperature}°C</div>
+                  <div className="text-gray-600">{weatherData.condition}</div>
                 </div>
+                
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center">
-                    <CloudRain className="mr-2 h-4 w-4 text-blue-500" />
-                    <span>20% Rain</span>
+                    <Droplets className="mr-2 h-4 w-4 text-blue-500" />
+                    <span>{weatherData.humidity}% Humidity</span>
                   </div>
                   <div className="flex items-center">
                     <Wind className="mr-2 h-4 w-4 text-gray-500" />
-                    <span>15 km/h</span>
+                    <span>{weatherData.windSpeed} km/h</span>
+                  </div>
+                  <div className="flex items-center">
+                    <CloudRain className="mr-2 h-4 w-4 text-blue-500" />
+                    <span>{weatherData.rainfall}% Rain</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Thermometer className="mr-2 h-4 w-4 text-orange-500" />
+                    <span>UV {weatherData.uvIndex}</span>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Soil Moisture</span>
+                    <span>{weatherData.soilMoisture}%</span>
+                  </div>
+                  <Progress value={weatherData.soilMoisture} className="h-2" />
+                </div>
+
                 <div className="text-xs text-gray-600 bg-green-50 p-2 rounded">
                   <strong>Farming Tip:</strong> Good conditions for harvesting and outdoor work today.
                 </div>
@@ -237,31 +292,64 @@ export const FarmerDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Performance Summary */}
+          {/* Advisory Alerts */}
           <Card>
             <CardHeader>
-              <CardTitle>This Month's Performance</CardTitle>
+              <CardTitle className="flex items-center">
+                <AlertTriangle className="mr-2 h-5 w-5 text-orange-500" />
+                Advisory Alerts
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Sales Target</span>
-                  <span className="font-medium">75%</span>
-                </div>
-                <Progress value={75} className="h-2" />
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Customer Satisfaction</span>
-                  <span className="font-medium">92%</span>
-                </div>
-                <Progress value={92} className="h-2" />
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Inventory Turnover</span>
-                  <span className="font-medium">68%</span>
-                </div>
-                <Progress value={68} className="h-2" />
+              <div className="space-y-3">
+                {advisoryAlerts.map((alert, index) => (
+                  <div key={index} className={`p-3 border rounded-lg ${getSeverityColor(alert.severity)}`}>
+                    <div className="flex items-start space-x-2">
+                      <AlertTriangle className="h-4 w-4 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">{alert.message}</p>
+                        <Badge variant="outline" className="mt-1 text-xs">
+                          {alert.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+              <Link to="/advisory" className="block mt-4">
+                <Button className="w-full" variant="outline">
+                  <Eye className="mr-2 h-4 w-4" />
+                  View All Advisories
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Fertilizer Advisory */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Leaf className="mr-2 h-5 w-5 text-green-500" />
+                Fertilizer Advisory
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-800">Recommended for this week:</p>
+                  <p className="text-sm text-green-700">Apply NPK 20-20-20 for tomatoes</p>
+                </div>
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm font-medium text-blue-800">Soil pH Alert:</p>
+                  <p className="text-sm text-blue-700">Consider lime application (pH 5.8)</p>
+                </div>
+              </div>
+              <Link to="/inputs-marketplace" className="block mt-4">
+                <Button className="w-full" variant="outline">
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Buy Fertilizers
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

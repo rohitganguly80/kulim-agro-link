@@ -10,11 +10,9 @@ import {
   ShoppingCart, 
   Package, 
   TrendingUp, 
-  MessageCircle,
-  Sun,
-  CloudRain,
-  Wind,
-  Eye
+  Eye,
+  Clock,
+  CheckCircle
 } from 'lucide-react';
 
 export const BuyerDashboard = () => {
@@ -28,10 +26,17 @@ export const BuyerDashboard = () => {
     { id: '3', product: 'Fertilizer NPK', quantity: '25 kg', status: 'Processing', date: '2024-01-10', total: 87.50 }
   ];
 
+  const orderStats = [
+    { label: 'Total Orders', value: '24', change: '+3 this month' },
+    { label: 'Completed', value: '22', change: '91.7% success rate' },
+    { label: 'In Transit', value: '2', change: 'Expected delivery' },
+    { label: 'Total Spent', value: '$1,250', change: '+15% this month' }
+  ];
+
   const recommendations = [
-    { id: '1', name: 'Fresh Carrots', price: 2.50, unit: 'kg', farmer: 'Green Valley Farm', image: '/images/crops/carrots.jpg' },
-    { id: '2', name: 'Organic Spinach', price: 4.00, unit: 'kg', farmer: 'Sunrise Organics', image: '/images/crops/spinach.jpg' },
-    { id: '3', name: 'Premium Rice', price: 1.80, unit: 'kg', farmer: 'Golden Harvest', image: '/images/crops/rice.jpg' }
+    { id: '1', name: 'Fresh Carrots', price: 2.50, unit: 'kg', farmer: 'Green Valley Farm' },
+    { id: '2', name: 'Organic Spinach', price: 4.00, unit: 'kg', farmer: 'Sunrise Organics' },
+    { id: '3', name: 'Premium Rice', price: 1.80, unit: 'kg', farmer: 'Golden Harvest' }
   ];
 
   const getStatusColor = (status: string) => {
@@ -43,11 +48,20 @@ export const BuyerDashboard = () => {
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Delivered': return <CheckCircle className="h-4 w-4" />;
+      case 'In Transit': return <Package className="h-4 w-4" />;
+      case 'Processing': return <Clock className="h-4 w-4" />;
+      default: return <Package className="h-4 w-4" />;
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name}!</h1>
-        <p className="text-gray-600 mt-2">Here's what's happening with your agricultural purchases</p>
+        <p className="text-gray-600 mt-2">Manage your purchases and track your orders</p>
       </div>
 
       {/* Quick Stats */}
@@ -90,12 +104,12 @@ export const BuyerDashboard = () => {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Advisory Used</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">Active Orders</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">8</span>
-              <MessageCircle className="h-6 w-6 text-green-600" />
+              <span className="text-2xl font-bold">2</span>
+              <Clock className="h-6 w-6 text-blue-600" />
             </div>
           </CardContent>
         </Card>
@@ -108,7 +122,7 @@ export const BuyerDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Jump to the most important tasks</CardDescription>
+              <CardDescription>Access marketplace and manage your orders</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -124,18 +138,37 @@ export const BuyerDashboard = () => {
                     Buy Inputs
                   </Button>
                 </Link>
-                <Link to="/advisory">
-                  <Button className="w-full" variant="outline">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Get Advisory
-                  </Button>
-                </Link>
                 <Link to="/cart">
                   <Button className="w-full" variant="outline">
                     <Eye className="mr-2 h-4 w-4" />
                     View Cart
                   </Button>
                 </Link>
+                <Link to="/profile">
+                  <Button className="w-full" variant="outline">
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    Order History
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Order Statistics */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Statistics</CardTitle>
+              <CardDescription>Your purchasing overview</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {orderStats.map((stat, index) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{stat.value}</div>
+                    <div className="font-medium text-gray-900">{stat.label}</div>
+                    <div className="text-sm text-gray-600">{stat.change}</div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -149,10 +182,15 @@ export const BuyerDashboard = () => {
             <CardContent>
               <div className="space-y-4">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{order.product}</h4>
-                      <p className="text-sm text-gray-600">{order.quantity} • {order.date}</p>
+                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        {getStatusIcon(order.status)}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium">{order.product}</h4>
+                        <p className="text-sm text-gray-600">{order.quantity} • {order.date}</p>
+                      </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Badge className={getStatusColor(order.status)}>
@@ -169,34 +207,6 @@ export const BuyerDashboard = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Weather Widget */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Sun className="mr-2 h-5 w-5 text-yellow-500" />
-                Weather Today
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold">24°C</div>
-                  <div className="text-gray-600">Partly Cloudy</div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center">
-                    <CloudRain className="mr-2 h-4 w-4 text-blue-500" />
-                    <span>20% Rain</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Wind className="mr-2 h-4 w-4 text-gray-500" />
-                    <span>15 km/h</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Recommendations */}
           <Card>
             <CardHeader>
@@ -217,6 +227,33 @@ export const BuyerDashboard = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats */}
+          <Card>
+            <CardHeader>
+              <CardTitle>This Month</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Orders Placed</span>
+                  <span className="font-medium">6</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Total Spent</span>
+                  <span className="font-medium">$347.50</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Avg Order Value</span>
+                  <span className="font-medium">$57.92</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Favorite Category</span>
+                  <span className="font-medium">Vegetables</span>
+                </div>
               </div>
             </CardContent>
           </Card>
